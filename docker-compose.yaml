@@ -1,0 +1,50 @@
+services:
+  mysql:
+    image: mysql:8.0
+    container_name: mysql_server
+    environment:
+      MYSQL_ROOT_PASSWORD: root
+      MYSQL_DATABASE: root
+    ports:
+      - 3306:3306
+    volumes:
+      - mysql_data:/var/lib/mysql
+    networks:
+      - mynetw
+
+  mongodb:
+    image: mongo:latest
+    container_name: mongodb_server
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: mongoroot
+      MONGO_INITDB_ROOT_PASSWORD: mongoroot
+    ports:
+      - 27017:27017
+    volumes:
+      - mongodb_data:/var/lib/mongo
+    networks:
+      - mynetw
+
+  turfoff:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    image: harsh1234566/turfoff
+    depends_on:
+      - mysql
+      - mongodb
+    restart: unless-stopped
+    stdin_open: true
+    tty: true
+    ports:
+      - "8080:8080"
+    networks:
+      - mynetw
+
+volumes:
+  mysql_data:
+  mongodb_data:
+
+networks:
+  mynetw:
+    driver: bridge
